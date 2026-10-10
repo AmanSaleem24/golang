@@ -12,8 +12,9 @@ func processChan(numChan chan int){
 	}
 }
 
-func emailSender(emailChan chan string, done chan bool){
+func emailSender(emailChan <-chan string, done chan<- bool){
 	defer func() { done <- true} ()
+
 
 	for email:= range emailChan {
 		fmt.Println("Sending mail to", email)
@@ -24,17 +25,39 @@ func emailSender(emailChan chan string, done chan bool){
 
 func main(){
 
-	emailChan := make(chan string, 100)
-	done := make(chan bool)
+	chan1 := make(chan int)
+	chan2 := make(chan string)
 
-	go emailSender(emailChan, done)
+	go func() {
+		chan1 <- 10
+	} ()
 
+	go func() {
+		chan2 <- "golang"
+	} ()
 
-	for i:= range 100 {
-		emailChan <- fmt.Sprintf("%d@gmail.com", i)
+	for i := 0; i < 2; i++ {
+		select {
+		case chan1Val :=  <- chan1:
+			fmt.Println("Chan1 value is", chan1Val)
+		case chan2Val := <- chan2:
+			fmt.Println("Chan 2 value is", chan2Val)
+		}
 	}
 
-	<- done
+	// emailChan := make(chan string, 100)
+	// done := make(chan bool)
+
+	// go emailSender(emailChan, done)
+
+
+	// for i:= range 100 {
+	// 	emailChan <- fmt.Sprintf("%d@gmail.com", i)
+	// }
+
+	// close(emailChan)
+
+	// <- done
 
 
 	// numChan := make(chan int)
