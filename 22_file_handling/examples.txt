@@ -1,0 +1,1 @@
+hello golang. Getting written to the destination file, this is the source file and this will end up in the destination file.
